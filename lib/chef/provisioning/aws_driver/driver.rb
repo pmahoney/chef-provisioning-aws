@@ -1277,6 +1277,8 @@ EOD
     def private_key_for(machine_spec, machine_options, instance)
       if instance.respond_to?(:private_key) && instance.private_key
         instance.private_key
+      elsif machine_options[:bootstrap_options] && machine_options[:bootstrap_options][:key_path]
+        IO.read(machine_options[:bootstrap_options][:key_path])
       elsif instance.respond_to?(:key_name) && instance.key_name
         key = get_private_key(instance.key_name)
         unless key
@@ -1289,8 +1291,6 @@ EOD
           raise "Server was created with key name '#{machine_spec.reference['key_name']}', but the corresponding private key was not found locally.  Check if the key is in Chef::Config.private_key_paths: #{Chef::Config.private_key_paths.join(', ')}"
         end
         key
-      elsif machine_options[:bootstrap_options] && machine_options[:bootstrap_options][:key_path]
-        IO.read(machine_options[:bootstrap_options][:key_path])
       elsif machine_options[:bootstrap_options] && machine_options[:bootstrap_options][:key_name]
         get_private_key(machine_options[:bootstrap_options][:key_name])
       else
